@@ -1,0 +1,13 @@
+# Target labels
+ PioasmBuild
+# Source files and their labels
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/CMakeFiles/PioasmBuild
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/CMakeFiles/PioasmBuild.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/CMakeFiles/PioasmBuild-complete.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-build.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-configure.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-download.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-install.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-mkdir.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-patch.rule
+C:/Users/theka/source/repos/pico-led/build/pico-sdk/src/rp2_common/tinyusb/pioasm/src/PioasmBuild-stamp/PioasmBuild-update.rule

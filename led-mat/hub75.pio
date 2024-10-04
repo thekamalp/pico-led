@@ -1,0 +1,127 @@
+.program hub75_data
+.side_set 1
+
+; Send two rows of data to hub75 interfaace
+; Processor parse color so PIO just streams it out
+
+.wrap_target
+    out pins, 8   side 0     ; Send 8 bits to LED, clk = 0
+    nop           side 1     ; clk = 1
+.wrap
+
+% c-sdk {
+
+// Helper function (for use in C program) to initialize this PIO program
+void hub75_data_program_init(PIO pio, uint sm, uint offset, float div) {
+
+    // Sets up state machine and wrap target. This function is automatically
+    // generated in hub75.pio.h.
+    pio_sm_config c = hub75_data_program_get_default_config(offset);
+
+    // Allow PIO to control GPIO pin (as output)
+    pio_gpio_init(pio, HUB75_R0);
+    pio_gpio_init(pio, HUB75_G0);
+    pio_gpio_init(pio, HUB75_B0);
+    pio_gpio_init(pio, HUB75_R1);
+    pio_gpio_init(pio, HUB75_G1);
+    pio_gpio_init(pio, HUB75_B1);
+    pio_gpio_init(pio, HUB75_CLK);
+
+    // Connect pin to OUT pin (control with 'out' instruction)
+    sm_config_set_out_pins(&c, HUB75_COLOR_BASE, 8);
+
+    // side connectiton to clock
+    sm_config_set_sideset_pins(&c, HUB75_CLK);
+
+    // Set the pin direction to output (in PIO)
+    pio_sm_set_consecutive_pindirs(pio, sm, HUB75_COLOR_BASE, 8, true);
+    pio_sm_set_consecutive_pindirs(pio, sm, HUB75_CLK, 1, true);
+
+    // join input to the output fifo
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    // setup autopull
+    sm_config_set_out_shift(&c, true, true, 32);
+    
+    // Set the clock divider for the state machine
+    sm_config_set_clkdiv(&c, div);
+
+    // Load configuration and jump to start of the program
+    pio_sm_init(pio, sm, offset, &c);
+}
+
+static inline void hub75_wait_tx_stall(PIO pio, uint sm) {
+    uint32_t txstall_mask = 1u << (PIO_FDEBUG_TXSTALL_LSB + sm);
+    pio->fdebug = txstall_mask;
+    while (!(pio->fdebug & txstall_mask))
+        tight_loop_contents();
+}
+
+%}
+
+.program hub75_ctrl
+.side_set 2
+
+; Set the row address while setting BLANK, and then toggle on latch
+
+.wrap_target
+    out pins, 32          side 0x2 ; output address
+    out x, 16             side 0x2 ; Read on_delay, Set vblank
+    out y, 16             side 0x3 ; Read off_delay, set latch
+    in NULL, 32           side 0x2 ; clear latch, and ack knowledge to cpu
+    jmp !x off_ack        side 0x2 ; don't light panel if on delay is 0
+on_loop:
+    jmp x-- on_loop       side 0x0 ; clear pins and leave leds on
+off_ack:
+;    in NULL 32            side 0x2 ; acknowledge CPU that leds are off
+off_loop:
+    jmp y-- off_loop      side 0x2 ; set vblank and to set leds off
+.wrap
+
+% c-sdk {
+
+// Helper function (for use in C program) to initialize this PIO program
+void hub75_ctrl_program_init(PIO pio, uint sm, uint offset, float div) {
+
+    // Sets up state machine and wrap target. This function is automatically
+    // generated in hub75.pio.h.
+    pio_sm_config c = hub75_ctrl_program_get_default_config(offset);
+
+    // Allow PIO to control GPIO pin (as output)
+    pio_gpio_init(pio, HUB75_LATCH);
+    pio_gpio_init(pio, HUB75_BLANK);
+
+    // Set the pin direction to output (in PIO)
+    pio_sm_set_consecutive_pindirs(pio, sm, HUB75_LATCH, 2, true);
+
+    // side connections for latch and blank
+    sm_config_set_sideset_pins(&c, HUB75_LATCH);
+
+    // Allow PIO to control GPIO pin (as output)
+    pio_gpio_init(pio, HUB75_A0);
+    pio_gpio_init(pio, HUB75_A1);
+    pio_gpio_init(pio, HUB75_A2);
+    pio_gpio_init(pio, HUB75_A3);
+    pio_gpio_init(pio, HUB75_A4);
+
+    // Connect pin to OUT pin (control with 'out' instruction)
+    sm_config_set_out_pins(&c, HUB75_ADDR_BASE, HUB75_ADDR_PIN_RANGE);
+
+    // Set the pin direction to output (in PIO)
+    pio_sm_set_consecutive_pindirs(pio, sm, HUB75_ADDR_BASE, HUB75_ADDR_PIN_RANGE, true);
+
+    // setup autopull
+    sm_config_set_out_shift(&c, true, true, 32);
+
+    // setup autopush
+    sm_config_set_in_shift(&c, true, true, 32);
+    
+    // Set the clock divider for the state machine
+    sm_config_set_clkdiv(&c, div);
+
+    // Load configuration and jump to start of the program
+    pio_sm_init(pio, sm, offset, &c);
+
+}
+
+%}

@@ -1,0 +1,3 @@
+C:/Users/theka/source/repos/pico-led/build/pioasm/CMakeFiles/pioasm.dir
+C:/Users/theka/source/repos/pico-led/build/pioasm/CMakeFiles/edit_cache.dir
+C:/Users/theka/source/repos/pico-led/build/pioasm/CMakeFiles/rebuild_cache.dir
